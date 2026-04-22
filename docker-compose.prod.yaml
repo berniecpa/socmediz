@@ -1,17 +1,17 @@
 services:
-  postiz:
+  planetpost:
     build:
       context: .
       dockerfile: Dockerfile.dev
-    container_name: postiz
+    container_name: planetpost
     restart: always
     environment:
       MAIN_URL: 'http://localhost:4007'
       FRONTEND_URL: 'http://localhost:4007'
       NEXT_PUBLIC_BACKEND_URL: 'http://localhost:4007/api'
       JWT_SECRET: 'random string that is unique to every install - just type random characters here!'
-      DATABASE_URL: 'postgresql://postiz-user:postiz-password@postiz-postgres:5432/postiz-db-local'
-      REDIS_URL: 'redis://postiz-redis:6379'
+      DATABASE_URL: 'postgresql://planetpost-user:planetpost-password@planetpost-postgres:5432/planetpost-db-local'
+      REDIS_URL: 'redis://planetpost-redis:6379'
       BACKEND_INTERNAL_URL: 'http://localhost:3000'
       TEMPORAL_ADDRESS: "temporal:7233"
       IS_GENERAL: 'true'
@@ -79,40 +79,40 @@ services:
       NX_ADD_PLUGINS: false
 
     volumes:
-      - postiz-config:/config/
-      - postiz-uploads:/uploads/
+      - planetpost-config:/config/
+      - planetpost-uploads:/uploads/
     ports:
       - "4007:5000"
     networks:
-      - postiz-network
+      - planetpost-network
       - temporal-network
     depends_on:
-      postiz-postgres:
+      planetpost-postgres:
         condition: service_healthy
-      postiz-redis:
+      planetpost-redis:
         condition: service_healthy
 
-  postiz-postgres:
+  planetpost-postgres:
     image: postgres:17-alpine
-    container_name: postiz-postgres
+    container_name: planetpost-postgres
     restart: always
     environment:
-      POSTGRES_PASSWORD: postiz-password
-      POSTGRES_USER: postiz-user
-      POSTGRES_DB: postiz-db-local
+      POSTGRES_PASSWORD: planetpost-password
+      POSTGRES_USER: planetpost-user
+      POSTGRES_DB: planetpost-db-local
     volumes:
       - postgres-volume:/var/lib/postgresql/data
     networks:
-      - postiz-network
+      - planetpost-network
     healthcheck:
-      test: pg_isready -U postiz-user -d postiz-db-local
+      test: pg_isready -U planetpost-user -d planetpost-db-local
       interval: 10s
       timeout: 3s
       retries: 3
 
-  postiz-redis:
+  planetpost-redis:
     image: redis:7.2
-    container_name: postiz-redis
+    container_name: planetpost-redis
     restart: always
     healthcheck:
       test: redis-cli ping
@@ -120,9 +120,9 @@ services:
       timeout: 3s
       retries: 3
     volumes:
-      - postiz-redis-data:/data
+      - planetpost-redis-data:/data
     networks:
-      - postiz-network
+      - planetpost-network
 
   # -----------------------
   # Temporal Stack
@@ -209,15 +209,15 @@ services:
 volumes:
   postgres-volume:
     external: false
-  postiz-redis-data:
+  planetpost-redis-data:
     external: false
-  postiz-config:
+  planetpost-config:
     external: false
-  postiz-uploads:
+  planetpost-uploads:
     external: false
 
 networks:
-  postiz-network:
+  planetpost-network:
     external: false
   temporal-network:
     driver: bridge
