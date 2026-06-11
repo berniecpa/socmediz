@@ -10,53 +10,65 @@ export const LogoTextComponent = () => {
       xmlns="http://www.w3.org/2000/svg"
     >
       <defs>
-        <linearGradient id="bmm-lt-bubble" x1="6" y1="4" x2="54" y2="56" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#8B5CF6" />
-          <stop offset="100%" stopColor="#4338CA" />
+        <radialGradient id="pp-lt-planet" cx="36%" cy="30%" r="65%">
+          <stop offset="0%" stopColor="#93C5FD" />
+          <stop offset="48%" stopColor="#2563EB" />
+          <stop offset="100%" stopColor="#1E3A8A" />
+        </radialGradient>
+        <linearGradient id="pp-lt-ring" x1="1" y1="30" x2="36" y2="30" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#818CF8" />
+          <stop offset="100%" stopColor="#38BDF8" />
         </linearGradient>
+        <clipPath id="pp-lt-clip">
+          <rect x="0" y="29" width="48" height="19" />
+        </clipPath>
       </defs>
 
-      <g transform="translate(0 3) scale(0.7)">
-        {/* Speech bubble */}
-        <path
-          d="M16,3 L44,3 Q57,3 57,16 L57,36 Q57,49 44,49 L26,49 L11,58 L14.5,49 L16,49 Q3,49 3,36 L3,16 Q3,3 16,3 Z"
-          fill="url(#bmm-lt-bubble)"
-        />
+      {/* Back ring */}
+      <ellipse
+        cx="18" cy="30" rx="17.5" ry="6"
+        stroke="url(#pp-lt-ring)" strokeWidth="3.2" opacity="0.4"
+        transform="rotate(-18 18 30)"
+      />
 
-        {/* Bubble sheen */}
-        <ellipse cx="18" cy="12" rx="9" ry="4.5" fill="white" opacity="0.16" transform="rotate(-18 18 12)" />
+      {/* Planet */}
+      <circle cx="18" cy="30" r="13" fill="url(#pp-lt-planet)" />
 
-        {/* Bernie "B" */}
-        <path
-          fillRule="evenodd"
-          clipRule="evenodd"
-          d="M20,12 L33,12 C38.2,12 41.8,14.9 41.8,19.4 C41.8,22.7 39.9,25 37.1,26 C40.7,26.9 43.4,29.5 43.4,33.4 C43.4,37.7 39.7,40 34.2,40 L20,40 Z M26.5,17.2 L32.3,17.2 C34.6,17.2 35.9,18.4 35.9,20.3 C35.9,22.2 34.6,23.4 32.3,23.4 L26.5,23.4 Z M26.5,28.6 L33.2,28.6 C35.8,28.6 37.2,29.8 37.2,31.8 C37.2,33.8 35.8,35 33.2,35 L26.5,35 Z"
-          fill="white"
-        />
-      </g>
+      {/* Planet sheen */}
+      <ellipse cx="14" cy="26" rx="5" ry="3" fill="white" opacity="0.18" transform="rotate(-20 14 26)" />
+
+      {/* Front ring */}
+      <ellipse
+        cx="18" cy="30" rx="17.5" ry="6"
+        stroke="url(#pp-lt-ring)" strokeWidth="3.2"
+        clipPath="url(#pp-lt-clip)"
+        transform="rotate(-18 18 30)"
+      />
+
+      {/* Speech bubble */}
+      <path
+        d="M28,3 L42,3 Q46,3 46,7 L46,16 Q46,20 42,20 L35,20 L30,26 L29,20 L28,20 Q24,20 24,16 L24,7 Q24,3 28,3 Z"
+        fill="white"
+        stroke="#60A5FA"
+        strokeWidth="1.6"
+      />
+
+      {/* Typing dots */}
+      <circle cx="30" cy="11.5" r="1.8" fill="#2563EB" />
+      <circle cx="35" cy="11.5" r="1.8" fill="#2563EB" />
+      <circle cx="40" cy="11.5" r="1.8" fill="#2563EB" />
 
       {/* Wordmark */}
       <text
-        x="50"
-        y="27"
+        x="54"
+        y="34"
         fontFamily="Inter, system-ui, -apple-system, sans-serif"
         fontWeight="800"
-        fontSize="24"
+        fontSize="23"
         letterSpacing="-0.5"
-        fill="currentColor"
       >
-        Bernie
-      </text>
-      <text
-        x="51"
-        y="42"
-        fontFamily="Inter, system-ui, -apple-system, sans-serif"
-        fontWeight="700"
-        fontSize="9"
-        letterSpacing="2.4"
-        fill="#8B5CF6"
-      >
-        MEDIA MANAGER
+        <tspan fill="currentColor">Planet</tspan>
+        <tspan fill="#2563EB">Post</tspan>
       </text>
     </svg>
   );
