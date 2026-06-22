@@ -1,0 +1,250 @@
+# PlanetPost — Dokploy deployment compose
+# ---------------------------------------------------------------------------
+# Use this file as the "Compose Path" in a Dokploy Docker Compose service:
+#     ./docker-compose.dokploy.yaml
+#
+# Set these in the Dokploy Environment tab (NOT committed to git):
+#   DOMAIN              e.g. app.yourdomain.com   (no scheme, no trailing slash)
+#   JWT_SECRET          openssl rand -hex 32
+#   POSTGRES_PASSWORD   strong password (reused inside DATABASE_URL automatically)
+#
+# Then in the service Domains tab add: host=$DOMAIN, service=planetpost, port=5000.
+# Optional channel/API keys default to empty — fill only the ones you use.
+# ---------------------------------------------------------------------------
+
+services:
+  planetpost:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: planetpost
+    restart: always
+    environment:
+      # === Public URLs (driven by ${DOMAIN}) — must be https, no trailing slash
+      MAIN_URL: 'https://${DOMAIN}'
+      FRONTEND_URL: 'https://${DOMAIN}'
+      NEXT_PUBLIC_BACKEND_URL: 'https://${DOMAIN}/api'
+      BACKEND_INTERNAL_URL: 'http://localhost:3000'
+
+      # === Secrets (set in Dokploy Environment tab)
+      JWT_SECRET: '${JWT_SECRET}'
+      DATABASE_URL: 'postgresql://planetpost-user:${POSTGRES_PASSWORD}@planetpost-postgres:5432/planetpost-db-local'
+      REDIS_URL: 'redis://planetpost-redis:6379'
+
+      TEMPORAL_ADDRESS: 'temporal:7233'
+      IS_GENERAL: 'true'
+      DISABLE_REGISTRATION: '${DISABLE_REGISTRATION:-false}'
+      RUN_CRON: 'true'
+
+      # === Storage Settings
+      STORAGE_PROVIDER: '${STORAGE_PROVIDER:-local}'
+      UPLOAD_DIRECTORY: '/uploads'
+      NEXT_PUBLIC_UPLOAD_DIRECTORY: '/uploads'
+
+      # === Cloudflare (R2) Settings — only used when STORAGE_PROVIDER=cloudflare
+      CLOUDFLARE_ACCOUNT_ID: '${CLOUDFLARE_ACCOUNT_ID:-}'
+      CLOUDFLARE_ACCESS_KEY: '${CLOUDFLARE_ACCESS_KEY:-}'
+      CLOUDFLARE_SECRET_ACCESS_KEY: '${CLOUDFLARE_SECRET_ACCESS_KEY:-}'
+      CLOUDFLARE_BUCKETNAME: '${CLOUDFLARE_BUCKETNAME:-}'
+      CLOUDFLARE_BUCKET_URL: '${CLOUDFLARE_BUCKET_URL:-}'
+      CLOUDFLARE_REGION: '${CLOUDFLARE_REGION:-auto}'
+
+      # === Social Media API Settings (fill only the channels you use)
+      X_API_KEY: '${X_API_KEY:-}'
+      X_API_SECRET: '${X_API_SECRET:-}'
+      LINKEDIN_CLIENT_ID: '${LINKEDIN_CLIENT_ID:-}'
+      LINKEDIN_CLIENT_SECRET: '${LINKEDIN_CLIENT_SECRET:-}'
+      REDDIT_CLIENT_ID: '${REDDIT_CLIENT_ID:-}'
+      REDDIT_CLIENT_SECRET: '${REDDIT_CLIENT_SECRET:-}'
+      GITHUB_CLIENT_ID: '${GITHUB_CLIENT_ID:-}'
+      GITHUB_CLIENT_SECRET: '${GITHUB_CLIENT_SECRET:-}'
+      BEEHIIVE_API_KEY: '${BEEHIIVE_API_KEY:-}'
+      BEEHIIVE_PUBLICATION_ID: '${BEEHIIVE_PUBLICATION_ID:-}'
+      THREADS_APP_ID: '${THREADS_APP_ID:-}'
+      THREADS_APP_SECRET: '${THREADS_APP_SECRET:-}'
+      FACEBOOK_APP_ID: '${FACEBOOK_APP_ID:-}'
+      FACEBOOK_APP_SECRET: '${FACEBOOK_APP_SECRET:-}'
+      YOUTUBE_CLIENT_ID: '${YOUTUBE_CLIENT_ID:-}'
+      YOUTUBE_CLIENT_SECRET: '${YOUTUBE_CLIENT_SECRET:-}'
+      TIKTOK_CLIENT_ID: '${TIKTOK_CLIENT_ID:-}'
+      TIKTOK_CLIENT_SECRET: '${TIKTOK_CLIENT_SECRET:-}'
+      PINTEREST_CLIENT_ID: '${PINTEREST_CLIENT_ID:-}'
+      PINTEREST_CLIENT_SECRET: '${PINTEREST_CLIENT_SECRET:-}'
+      DRIBBBLE_CLIENT_ID: '${DRIBBBLE_CLIENT_ID:-}'
+      DRIBBBLE_CLIENT_SECRET: '${DRIBBBLE_CLIENT_SECRET:-}'
+      DISCORD_CLIENT_ID: '${DISCORD_CLIENT_ID:-}'
+      DISCORD_CLIENT_SECRET: '${DISCORD_CLIENT_SECRET:-}'
+      DISCORD_BOT_TOKEN_ID: '${DISCORD_BOT_TOKEN_ID:-}'
+      SLACK_ID: '${SLACK_ID:-}'
+      SLACK_SECRET: '${SLACK_SECRET:-}'
+      SLACK_SIGNING_SECRET: '${SLACK_SIGNING_SECRET:-}'
+      MASTODON_URL: '${MASTODON_URL:-https://mastodon.social}'
+      MASTODON_CLIENT_ID: '${MASTODON_CLIENT_ID:-}'
+      MASTODON_CLIENT_SECRET: '${MASTODON_CLIENT_SECRET:-}'
+
+      # === Misc Settings
+      OPENAI_API_KEY: '${OPENAI_API_KEY:-}'
+      API_LIMIT: '${API_LIMIT:-30}'
+
+      # === Payment / Stripe Settings
+      FEE_AMOUNT: '${FEE_AMOUNT:-0.05}'
+      STRIPE_PUBLISHABLE_KEY: '${STRIPE_PUBLISHABLE_KEY:-}'
+      STRIPE_SECRET_KEY: '${STRIPE_SECRET_KEY:-}'
+      STRIPE_SIGNING_KEY: '${STRIPE_SIGNING_KEY:-}'
+      STRIPE_SIGNING_KEY_CONNECT: '${STRIPE_SIGNING_KEY_CONNECT:-}'
+
+      NX_ADD_PLUGINS: 'false'
+
+    volumes:
+      - planetpost-config:/config/
+      - planetpost-uploads:/uploads/
+    # No host port publishing — Traefik routes to container port 5000 via the
+    # Dokploy Domains tab. nginx inside the container listens on 5000.
+    expose:
+      - '5000'
+    networks:
+      - planetpost-network
+      - temporal-network
+      - dokploy-network
+    depends_on:
+      planetpost-postgres:
+        condition: service_healthy
+      planetpost-redis:
+        condition: service_healthy
+
+  planetpost-postgres:
+    image: postgres:17-alpine
+    container_name: planetpost-postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD}'
+      POSTGRES_USER: planetpost-user
+      POSTGRES_DB: planetpost-db-local
+    volumes:
+      - postgres-volume:/var/lib/postgresql/data
+    networks:
+      - planetpost-network
+    healthcheck:
+      test: pg_isready -U planetpost-user -d planetpost-db-local
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  planetpost-redis:
+    image: redis:7.2
+    container_name: planetpost-redis
+    restart: always
+    healthcheck:
+      test: redis-cli ping
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    volumes:
+      - planetpost-redis-data:/data
+    networks:
+      - planetpost-network
+
+  # -----------------------
+  # Temporal Stack
+  # (Optional: delete these 5 services and point TEMPORAL_ADDRESS at Temporal
+  #  Cloud to save significant RAM — see Task 11 in ClickUp.)
+  # -----------------------
+  temporal-elasticsearch:
+    container_name: temporal-elasticsearch
+    image: elasticsearch:7.17.27
+    environment:
+      - cluster.routing.allocation.disk.threshold_enabled=true
+      - cluster.routing.allocation.disk.watermark.low=512mb
+      - cluster.routing.allocation.disk.watermark.high=256mb
+      - cluster.routing.allocation.disk.watermark.flood_stage=128mb
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms256m -Xmx256m
+      - xpack.security.enabled=false
+    networks:
+      - temporal-network
+    expose:
+      - 9200
+    volumes:
+      - /var/lib/elasticsearch/data
+
+  temporal-postgresql:
+    container_name: temporal-postgresql
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: temporal
+      POSTGRES_USER: temporal
+    networks:
+      - temporal-network
+    expose:
+      - 5432
+    volumes:
+      - /var/lib/postgresql/data
+
+  temporal:
+    container_name: temporal
+    expose:
+      - '7233'
+    image: temporalio/auto-setup:1.28.1
+    depends_on:
+      - temporal-postgresql
+      - temporal-elasticsearch
+    environment:
+      - DB=postgres12
+      - DB_PORT=5432
+      - POSTGRES_USER=temporal
+      - POSTGRES_PWD=temporal
+      - POSTGRES_SEEDS=temporal-postgresql
+      - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development-sql.yaml
+      - ENABLE_ES=true
+      - ES_SEEDS=temporal-elasticsearch
+      - ES_VERSION=v7
+      - TEMPORAL_NAMESPACE=default
+    networks:
+      - temporal-network
+    volumes:
+      - ./dynamicconfig:/etc/temporal/config/dynamicconfig
+
+  temporal-admin-tools:
+    container_name: temporal-admin-tools
+    image: temporalio/admin-tools:1.28.1-tctl-1.18.4-cli-1.4.1
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_CLI_ADDRESS=temporal:7233
+    networks:
+      - temporal-network
+    stdin_open: true
+    depends_on:
+      - temporal
+    tty: true
+
+  temporal-ui:
+    container_name: temporal-ui
+    image: temporalio/ui:2.34.0
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_CORS_ORIGINS=https://${DOMAIN}
+    networks:
+      - temporal-network
+    expose:
+      - '8080'
+
+volumes:
+  postgres-volume:
+    external: false
+  planetpost-redis-data:
+    external: false
+  planetpost-config:
+    external: false
+  planetpost-uploads:
+    external: false
+
+networks:
+  planetpost-network:
+    external: false
+  temporal-network:
+    driver: bridge
+    name: temporal-network
+  # Dokploy's shared network — Traefik lives here and routes your domain to the
+  # planetpost service. Created by the Dokploy installer.
+  dokploy-network:
+    external: true
