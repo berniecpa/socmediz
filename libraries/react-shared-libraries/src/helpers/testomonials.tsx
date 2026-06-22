@@ -1,3 +1,10 @@
-export const testimonials1: never[] = [];
+export interface Testimonial {
+  picture: string;
+  name: string;
+  description: string;
+  content: any;
+}
 
-export const testimonials2: never[] = [];
+export const testimonials1: Testimonial[] = [];
+
+export const testimonials2: Testimonial[] = [];
