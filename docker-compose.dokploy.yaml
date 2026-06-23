@@ -4,11 +4,16 @@
 #     ./docker-compose.dokploy.yaml
 #
 # Set these in the Dokploy Environment tab (NOT committed to git):
-#   DOMAIN              e.g. app.yourdomain.com   (no scheme, no trailing slash)
-#   JWT_SECRET          openssl rand -hex 32
-#   POSTGRES_PASSWORD   strong password (reused inside DATABASE_URL automatically)
+#   POSTIZ_HOST   the public host, no scheme/trailing slash (e.g. app.example.com)
+#   JWT_SECRET    long random string
+#   DB_PASSWORD   URL-safe password (no @ : / # ? %)
+#   DB_USER       defaults to "postiz" if unset
+#   DB_NAME       defaults to "postiz" if unset
 #
-# Then in the service Domains tab add: host=$DOMAIN, service=planetpost, port=5000.
+# DATABASE_URL and the postgres init vars are both built from DB_USER/DB_PASSWORD/
+# DB_NAME, so they can never drift. Public URLs are built from POSTIZ_HOST.
+#
+# Then in the service Domains tab add: host=$POSTIZ_HOST, service=planetpost, port=5000.
 # Optional channel/API keys default to empty — fill only the ones you use.
 # ---------------------------------------------------------------------------
 
@@ -20,15 +25,17 @@ services:
     container_name: planetpost
     restart: always
     environment:
-      # === Public URLs (driven by ${DOMAIN}) — must be https, no trailing slash
-      MAIN_URL: 'https://${DOMAIN}'
-      FRONTEND_URL: 'https://${DOMAIN}'
-      NEXT_PUBLIC_BACKEND_URL: 'https://${DOMAIN}/api'
+      # === Public URLs (driven by ${POSTIZ_HOST}) — must be https, no trailing slash
+      MAIN_URL: 'https://${POSTIZ_HOST}'
+      FRONTEND_URL: 'https://${POSTIZ_HOST}'
+      NEXT_PUBLIC_BACKEND_URL: 'https://${POSTIZ_HOST}/api'
       BACKEND_INTERNAL_URL: 'http://localhost:3000'
 
       # === Secrets (set in Dokploy Environment tab)
       JWT_SECRET: '${JWT_SECRET}'
-      DATABASE_URL: 'postgresql://planetpost-user:${POSTGRES_PASSWORD}@planetpost-postgres:5432/planetpost-db-local'
+      # DB creds are assembled from DB_USER/DB_PASSWORD/DB_NAME so they always
+      # match the postgres service below. Host stays the internal service name.
+      DATABASE_URL: 'postgresql://${DB_USER:-postiz}:${DB_PASSWORD}@planetpost-postgres:5432/${DB_NAME:-postiz}'
       REDIS_URL: 'redis://planetpost-redis:6379'
 
       TEMPORAL_ADDRESS: 'temporal:7233'
@@ -84,6 +91,8 @@ services:
 
       # === Misc Settings
       OPENAI_API_KEY: '${OPENAI_API_KEY:-}'
+      NEXT_PUBLIC_DISCORD_SUPPORT: '${NEXT_PUBLIC_DISCORD_SUPPORT:-}'
+      NEXT_PUBLIC_POLOTNO: '${NEXT_PUBLIC_POLOTNO:-}'
       API_LIMIT: '${API_LIMIT:-30}'
 
       # === Payment / Stripe Settings
@@ -117,15 +126,15 @@ services:
     container_name: planetpost-postgres
     restart: always
     environment:
-      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD}'
-      POSTGRES_USER: planetpost-user
-      POSTGRES_DB: planetpost-db-local
+      POSTGRES_PASSWORD: '${DB_PASSWORD}'
+      POSTGRES_USER: '${DB_USER:-postiz}'
+      POSTGRES_DB: '${DB_NAME:-postiz}'
     volumes:
       - postgres-volume:/var/lib/postgresql/data
     networks:
       - planetpost-network
     healthcheck:
-      test: pg_isready -U planetpost-user -d planetpost-db-local
+      test: pg_isready -U ${DB_USER:-postiz} -d ${DB_NAME:-postiz}
       interval: 10s
       timeout: 3s
       retries: 3
@@ -222,7 +231,7 @@ services:
     image: temporalio/ui:2.34.0
     environment:
       - TEMPORAL_ADDRESS=temporal:7233
-      - TEMPORAL_CORS_ORIGINS=https://${DOMAIN}
+      - TEMPORAL_CORS_ORIGINS=https://${POSTIZ_HOST}
     networks:
       - temporal-network
     expose:
