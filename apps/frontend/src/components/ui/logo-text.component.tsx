@@ -16,7 +16,7 @@ export const LogoTextComponent = () => {
           <stop offset="100%" stopColor="#1E3A8A" />
         </radialGradient>
         <linearGradient id="pp-lt-ring" x1="1" y1="30" x2="36" y2="30" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#818CF8" />
+          <stop offset="0%" stopColor="#60A5FA" />
           <stop offset="100%" stopColor="#38BDF8" />
         </linearGradient>
         <clipPath id="pp-lt-clip">

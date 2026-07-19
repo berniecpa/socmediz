@@ -214,7 +214,7 @@ const OnboardingStep1: FC<{ onNext: () => void; onSkip: () => void }> = ({
       <div className="flex justify-end pt-[24px] mt-[8px]">
         <button
           onClick={onNext}
-          className="group flex items-center gap-[12px] bg-gradient-to-r from-[#622aff] to-[#8b5cf6] hover:from-[#7c3aff] hover:to-[#9d6eff] text-white font-semibold px-[32px] py-[14px] rounded-[12px] text-[16px] transition-all shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40"
+          className="group flex items-center gap-[12px] bg-gradient-to-r from-[#1E3A8A] to-[#2563EB] hover:from-[#1D4ED8] hover:to-[#3B82F6] text-white font-semibold px-[32px] py-[14px] rounded-[12px] text-[16px] transition-all shadow-lg shadow-blue-600/25 hover:shadow-blue-600/40"
         >
           {sortedIntegrations.length > 0
             ? t('continue', 'Continue')
