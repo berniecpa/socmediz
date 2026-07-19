@@ -131,7 +131,7 @@ const NotificationComponent = () => {
               cx="17.0625"
               cy="5"
               r="4"
-              fill="#FF3EA2"
+              fill="#F97066"
               stroke="#1A1919"
               strokeWidth="2"
             />
