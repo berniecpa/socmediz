@@ -87,7 +87,7 @@ export const OnboardingModal: FC<OnboardingModalProps> = ({ onClose }) => {
                     step === 2 ? 'font-medium' : 'text-textColor'
                   )}
                 >
-                  {t('watch_tutorial', 'Watch Tutorial')}
+                  {t('onboarding_quick_tour', 'Quick Tour')}
                 </span>
               </div>
             </div>
@@ -250,26 +250,101 @@ const OnboardingStep2: FC<{ onBack: () => void; onFinish: () => void }> = ({
     <div className="flex flex-col gap-[24px] flex-1">
       <div className="flex gap-[4px] flex-col text-center">
         <div className="text-[24px] font-semibold">
-          {t('watch_tutorial_title', 'Learn How to Use PlanetPost')}
+          {t('onboarding_tour_title', "You're All Set!")}
         </div>
         <div className="text-[14px] text-customColor18">
           {t(
-            'watch_tutorial_description',
-            'Watch this short video to learn how to get the most out of PlanetPost'
+            'onboarding_tour_description',
+            "Here's a quick look at what you can do with PlanetPost"
           )}
         </div>
       </div>
 
-      {/* YouTube Video Embed */}
-      <div className="relative flex-1 rounded-[12px] overflow-hidden">
-        <div className="absolute left-0 top-0 w-full h-full flex justify-center">
-          <iframe
-            className="h-full aspect-video"
-            src="https://www.youtube.com/embed/BdsCVvEYgHU?si=vvhaZJ8I5oXXvVJS?autoplay=1"
-            title="PlanetPost Tutorial"
-            allow="autoplay"
-            allowFullScreen
-          />
+      {/* Feature highlights */}
+      <div className="flex-1 flex items-center justify-center">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-[16px] w-full max-w-[640px]">
+          {[
+            {
+              title: t('onboarding_feature_schedule', 'Schedule Posts'),
+              description: t(
+                'onboarding_feature_schedule_description',
+                'Write once and schedule to all your channels at the perfect time'
+              ),
+              icon: (
+                <>
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 6v6l4 2" />
+                </>
+              ),
+            },
+            {
+              title: t('onboarding_feature_calendar', 'Calendar View'),
+              description: t(
+                'onboarding_feature_calendar_description',
+                'See your entire content pipeline at a glance, day by day'
+              ),
+              icon: (
+                <>
+                  <rect x="3" y="4" width="18" height="18" rx="2" />
+                  <path d="M16 2v4M8 2v4M3 10h18" />
+                </>
+              ),
+            },
+            {
+              title: t('onboarding_feature_analytics', 'Analytics'),
+              description: t(
+                'onboarding_feature_analytics_description',
+                'Track how your posts perform across every platform'
+              ),
+              icon: (
+                <>
+                  <path d="M3 3v16a2 2 0 0 0 2 2h16" />
+                  <path d="M7 15l4-4 3 3 5-6" />
+                </>
+              ),
+            },
+            {
+              title: t('onboarding_feature_media', 'Media Library'),
+              description: t(
+                'onboarding_feature_media_description',
+                'Keep all your images and videos organized in one place'
+              ),
+              icon: (
+                <>
+                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                  <circle cx="9" cy="9" r="2" />
+                  <path d="m21 15-3.5-3.5a2 2 0 0 0-2.83 0L6 20" />
+                </>
+              ),
+            },
+          ].map((feature) => (
+            <div
+              key={feature.title}
+              className="flex gap-[14px] items-start p-[20px] rounded-[12px] bg-newTableHeader border border-newTableBorder"
+            >
+              <div className="w-[40px] h-[40px] shrink-0 rounded-[10px] bg-[#1E3A8A] flex items-center justify-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#93C5FD"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  {feature.icon}
+                </svg>
+              </div>
+              <div className="flex flex-col gap-[4px]">
+                <div className="text-[15px] font-semibold">{feature.title}</div>
+                <div className="text-[13px] text-customColor18">
+                  {feature.description}
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
