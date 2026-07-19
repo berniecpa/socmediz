@@ -323,7 +323,7 @@ body * {
 }
 //
 //:root {
-//  --copilot-kit-primary-color: #612ad5 !important;
+//  --copilot-kit-primary-color: #1E3A8A !important;
 //  --copilot-kit-background-color: #0b0f1c !important;
 //  --copilot-kit-separator-color: #1f2941 !important;
 //  --copilot-kit-contrast-color: #ffffff !important;
@@ -572,7 +572,7 @@ html[dir='rtl'] [dir='ltr'] {
 
 .ProseMirror .mention {
   font-weight: bold;
-  color: #ae8afc;
+  color: #8AB0FC;
 }
 
 .ProseMirror ul,
@@ -672,10 +672,10 @@ html[dir='rtl'] [dir='ltr'] {
   }
 
   .mention {
-    background-color: var(--purple-light);
+    background-color: rgba(37, 99, 235, 0.25);
     border-radius: 0.4rem;
     box-decoration-break: clone;
-    color: #ae8afc;
+    color: #8AB0FC;
     &::after {
       content: '\200B';
     }

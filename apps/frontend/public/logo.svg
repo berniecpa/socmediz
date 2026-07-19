@@ -6,7 +6,7 @@
       <stop offset="100%" stop-color="#1E3A8A"/>
     </radialGradient>
     <linearGradient id="pp-logo-ring" x1="1" y1="38" x2="45" y2="38" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#818CF8"/>
+      <stop offset="0%" stop-color="#60A5FA"/>
       <stop offset="100%" stop-color="#38BDF8"/>
     </linearGradient>
     <clipPath id="pp-logo-clip">
