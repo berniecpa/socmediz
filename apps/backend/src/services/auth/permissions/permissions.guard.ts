@@ -40,6 +40,13 @@ export class PoliciesGuard implements CanActivate {
       return true;
     }
 
+    // Super admins bypass all subscription-based limits
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    if (request?.user?.isSuperAdmin) {
+      return true;
+    }
+
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
     const { org }: { org: Organization } = request;

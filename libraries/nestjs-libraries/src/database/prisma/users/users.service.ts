@@ -20,6 +20,10 @@ export class UsersService {
     return this._usersRepository.getUserById(id);
   }
 
+  makeSuperAdmin(id: string) {
+    return this._usersRepository.makeSuperAdmin(id);
+  }
+
   getImpersonateUser(name: string) {
     return this._organizationRepository.getImpersonateUser(name);
   }

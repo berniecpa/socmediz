@@ -47,6 +47,17 @@ export class UsersRepository {
     });
   }
 
+  makeSuperAdmin(id: string) {
+    return this._user.model.user.update({
+      where: {
+        id,
+      },
+      data: {
+        isSuperAdmin: true,
+      },
+    });
+  }
+
   getUserByEmail(email: string) {
     return this._user.model.user.findFirst({
       where: {
