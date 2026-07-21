@@ -219,17 +219,17 @@ export function RegisterAfter({
                 )}
                 &nbsp;
                 <a
-                  href="#"
+                  href="/terms"
+                  target="_blank"
                   className="underline hover:font-bold"
-                  rel="nofollow"
                 >
                   {t('terms_of_service', 'Terms of Service')}
                 </a>
                 &nbsp;
                 {t('and', 'and')}&nbsp;
                 <a
-                  href="#"
-                  rel="nofollow"
+                  href="/privacy"
+                  target="_blank"
                   className="underline hover:font-bold"
                 >
                   {t('privacy_policy', 'Privacy Policy')}
