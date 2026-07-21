@@ -1,5 +1,6 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AuthController } from '@gitroom/backend/api/routes/auth.controller';
+import { AdminController } from '@gitroom/backend/api/routes/admin.controller';
 import { AuthService } from '@gitroom/backend/services/auth/auth.service';
 import { UsersController } from '@gitroom/backend/api/routes/users.controller';
 import { AuthMiddleware } from '@gitroom/backend/services/auth/auth.middleware';
@@ -70,6 +71,7 @@ const authenticatedController = [
     RootController,
     StripeController,
     AuthController,
+    AdminController,
     PublicController,
     MonitorController,
     EnterpriseController,

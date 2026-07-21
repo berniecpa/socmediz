@@ -309,6 +309,18 @@ export class AuthService {
   }
 
   private async jwt(user: User) {
+    const superAdminEmails = (process.env.SUPER_ADMIN_EMAILS || '')
+      .split(',')
+      .map((email) => email.trim().toLowerCase())
+      .filter(Boolean);
+    if (
+      !user.isSuperAdmin &&
+      user.email &&
+      superAdminEmails.includes(user.email.toLowerCase())
+    ) {
+      await this._userService.makeSuperAdmin(user.id);
+      user.isSuperAdmin = true;
+    }
     if (user.password) {
       delete user.password;
     }
