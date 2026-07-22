@@ -390,7 +390,7 @@ const AddAnnouncementModal: FC<{ close: () => void }> = ({ close }) => {
   );
 };
 
-const AddAnnouncement = () => {
+export const AddAnnouncement = () => {
   const { openModal } = useModals();
   const t = useT();
 
@@ -411,7 +411,7 @@ const AddAnnouncement = () => {
   );
 };
 
-const ImportDebugPost = () => {
+export const ImportDebugPost = () => {
   const { openModal } = useModals();
   const t = useT();
 
