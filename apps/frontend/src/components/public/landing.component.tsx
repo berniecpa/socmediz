@@ -135,9 +135,40 @@ const tierFeatures = (key: (typeof tierOrder)[number]) => {
   ];
 };
 
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      name: 'PlanetPost',
+      url: '/',
+      logo: '/logo.svg',
+    },
+    {
+      '@type': 'SoftwareApplication',
+      name: 'PlanetPost',
+      applicationCategory: 'BusinessApplication',
+      operatingSystem: 'Web',
+      description:
+        'Social media scheduling platform: plan on a calendar, write with AI, publish to 28+ social and chat channels, and measure results.',
+      offers: {
+        '@type': 'AggregateOffer',
+        priceCurrency: 'USD',
+        lowPrice: pricing.STANDARD.month_price,
+        highPrice: pricing.ULTIMATE.month_price,
+        offerCount: 4,
+      },
+    },
+  ],
+};
+
 export const LandingComponent = () => {
   return (
     <div className="flex min-h-screen flex-col overflow-x-hidden">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
       <PublicHeader />
 
       {/* Hero */}
