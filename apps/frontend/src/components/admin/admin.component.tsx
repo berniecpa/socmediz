@@ -5,6 +5,10 @@ import useSWR from 'swr';
 import clsx from 'clsx';
 import { useFetch } from '@gitroom/helpers/utils/custom.fetch';
 import { useUser } from '@gitroom/frontend/components/layout/user.context';
+import {
+  AddAnnouncement,
+  ImportDebugPost,
+} from '@gitroom/frontend/components/layout/impersonate';
 
 interface AdminStats {
   users: number;
@@ -147,7 +151,13 @@ export const AdminComponent = () => {
 
   return (
     <div className="flex flex-1 flex-col gap-[20px]">
-      <div className="text-[24px] font-[600]">Admin Dashboard</div>
+      <div className="flex items-center gap-[12px]">
+        <div className="flex-1 text-[24px] font-[600]">Admin Dashboard</div>
+        <div className="flex items-center gap-[8px] text-[13px] [&>div]:py-[8px] [&>div]:px-[14px] [&>div]:rounded-[8px]">
+          <ImportDebugPost />
+          <AddAnnouncement />
+        </div>
+      </div>
 
       <div className="grid grid-cols-6 gap-[12px] tablet:grid-cols-3 mobile:!grid-cols-2">
         <StatCard label="Users" value={stats?.users} />
