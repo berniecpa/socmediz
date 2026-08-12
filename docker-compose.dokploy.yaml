@@ -15,6 +15,17 @@
 #
 # Then in the service Domains tab add: host=$POSTIZ_HOST, service=planetpost, port=5000.
 # Optional channel/API keys default to empty — fill only the ones you use.
+#
+# NOTE: postgres only creates the role/database on the FIRST boot of an empty
+# data volume. If DB_USER/DB_NAME change after that (or you deployed an older
+# version of this file), the old volume keeps the old role and connections fail
+# with 'FATAL: role "postiz" does not exist'. Either wipe the volume
+# (docker volume rm <project>_postgres-volume — destroys data) or create the
+# role in the running container:
+#   docker exec planetpost-postgres psql -U <old_user> -d <old_db> \
+#     -c "CREATE ROLE postiz LOGIN SUPERUSER PASSWORD '<DB_PASSWORD>'"
+#   docker exec planetpost-postgres psql -U <old_user> -d <old_db> \
+#     -c "CREATE DATABASE postiz OWNER postiz"
 # ---------------------------------------------------------------------------
 
 services:
@@ -135,7 +146,11 @@ services:
     networks:
       - planetpost-network
     healthcheck:
-      test: pg_isready -U ${DB_USER:-postiz} -d ${DB_NAME:-postiz}
+      # pg_isready reports "accepting connections" even when the role/db are
+      # missing (e.g. a data volume initialized under an older DB_USER), which
+      # let the app start against a broken database. psql over the local
+      # socket actually verifies the role and database exist.
+      test: psql -U $${POSTGRES_USER} -d $${POSTGRES_DB} -c 'SELECT 1' >/dev/null
       interval: 10s
       timeout: 3s
       retries: 3
